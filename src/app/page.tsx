@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { generateBooks, Book } from "./utils/dataGenerator";
-import { FaSyncAlt, FaThumbsUp } from "react-icons/fa";
-import { faker } from "@faker-js/faker";
+import {FaSyncAlt, FaThumbsUp} from "react-icons/fa";
+import {faker} from "@faker-js/faker";
 
 export default function Home() {
     const [language, setLanguage] = useState<"en-US" | "de-DE" | "ar">("en-US");
@@ -13,6 +13,7 @@ export default function Home() {
     const [reviews, setReviews] = useState<number>(3);
     const [books, setBooks] = useState<Book[]>([]);
     const [page, setPage] = useState<number>(1);
+    // const [selectedBookIndex, setSelectedBookIndex] = useState<number | null>(null);
     const [selectedBook, setSelectedBook] = useState<Book | null>(null);
     const [reviewData, setReviewData] = useState<Record<number, string[]>>({});
 
@@ -20,14 +21,13 @@ export default function Home() {
     useEffect(() => {
         const newBooks = generateBooks(seed, language, "", likes, reviews, 1);
         setBooks(newBooks);
-        setPage(2); // Reset to page 2 for infinite scroll
-        generateReviewData(newBooks); // Generate review data for initial books
+        setPage(2);
+        generateReviewData(newBooks);
     }, [language, seed, likes, reviews]);
 
-    // Generate reviews dynamically for books
+    // Generate reviews dynamically
     const generateReviewData = (books: Book[]) => {
         const newReviewData: Record<number, string[]> = {};
-
         books.forEach((book) => {
             newReviewData[book.index] = Array.from({ length: book.reviews }, () => {
                 const reviewer = `${faker.person.firstName()} ${faker.person.lastName()}`;
@@ -35,7 +35,6 @@ export default function Home() {
                 return `${reviewer} wrote: "${comment}"`;
             });
         });
-
         setReviewData((prev) => ({ ...prev, ...newReviewData }));
     };
 
@@ -44,11 +43,15 @@ export default function Home() {
         const newBooks = generateBooks(seed, language, "", likes, reviews, page);
         setBooks((prevBooks) => [...prevBooks, ...newBooks]);
         setPage(page + 1);
-        generateReviewData(newBooks); // Add reviews for new books
+        generateReviewData(newBooks);
     };
 
+    // const toggleBookDetails = (index: number) => {
+    //     setSelectedBookIndex((prevIndex) => (prevIndex === index ? null : index));
+    // };
+
     return (
-        <div className="container mx-auto p-4 bg-black text-white min-h-screen">
+        <div className="container mx-auto p-4 bg-white text-black min-h-screen">
             {/* Header Section */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center mb-4">
                 <div className="flex items-center space-x-4">
@@ -56,7 +59,7 @@ export default function Home() {
                     <select
                         value={language}
                         onChange={(e) => setLanguage(e.target.value as "en-US" | "de-DE" | "ar")}
-                        className="border p-2 rounded bg-black text-white"
+                        className="border p-2 rounded bg-gray-100"
                     >
                         <option value="en-US">English (US)</option>
                         <option value="de-DE">German</option>
@@ -69,7 +72,7 @@ export default function Home() {
                         type="number"
                         value={seed}
                         onChange={(e) => setSeed(Number(e.target.value))}
-                        className="border p-2 rounded bg-black text-white w-24"
+                        className="border p-2 rounded bg-gray-100 w-24"
                     />
                     <FaSyncAlt
                         onClick={() => setSeed(Math.floor(Math.random() * 100000))}
@@ -96,7 +99,7 @@ export default function Home() {
                         type="number"
                         value={reviews}
                         onChange={(e) => setReviews(Number(e.target.value))}
-                        className="border p-2 rounded bg-black text-white w-16"
+                        className="border p-2 rounded bg-gray-100 w-16"
                     />
                 </div>
             </div>
@@ -110,7 +113,7 @@ export default function Home() {
                     loader={<h4 className="text-center mt-4">Loading more books...</h4>}
                 >
                     <table className="table-auto w-full border-collapse border border-gray-600">
-                        <thead className="bg-gray-800">
+                        <thead className="bg-gray-200">
                         <tr>
                             <th className="border p-2">#</th>
                             <th className="border p-2">ISBN</th>
@@ -125,10 +128,12 @@ export default function Home() {
                             <>
                                 <tr
                                     key={book.index}
-                                    className="hover:bg-gray-700 cursor-pointer"
+                                    className="hover:bg-gray-200 cursor-pointer"
                                     onClick={() => setSelectedBook(book)}
                                 >
-                                    <td className="border p-2 text-center">{book.index}</td>
+                                    <td className="border p-2 text-center">
+                                        {selectedBook?.index === book.index ? "▲" : "▼"} {book.index}
+                                    </td>
                                     <td className="border p-2">{book.isbn}</td>
                                     <td className="border p-2">{book.title}</td>
                                     <td className="border p-2">{book.author}</td>
@@ -143,8 +148,8 @@ export default function Home() {
                                 </tr>
                                 {selectedBook?.index === book.index && (
                                     <tr>
-                                        <td colSpan={6} className="p-4 bg-gray-700">
-                                            <div className="p-4 bg-gray-800 shadow rounded text-white">
+                                        <td colSpan={6} className="p-4 bg-gray-100">
+                                            <div className="p-4 bg-gray-200 shadow rounded text-black">
                                                 <h2 className="text-lg font-bold mb-2">{selectedBook.title}</h2>
                                                 <p className="text-sm mb-2">
                                                     <strong>Author(s):</strong> {selectedBook.author}
