@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { generateBooks, Book } from "./utils/dataGenerator";
-import { FaSyncAlt } from "react-icons/fa";
-import {faker} from "@faker-js/faker";
+import { FaSyncAlt, FaThumbsUp } from "react-icons/fa";
+import { faker } from "@faker-js/faker";
 
 export default function Home() {
     const [language, setLanguage] = useState<"en-US" | "de-DE" | "ar">("en-US");
@@ -14,7 +14,7 @@ export default function Home() {
     const [books, setBooks] = useState<Book[]>([]);
     const [page, setPage] = useState<number>(1);
     const [selectedBook, setSelectedBook] = useState<Book | null>(null);
-    const [reviewData, setReviewData] = useState<Record<number, string[]>>({}); // Store reviews for each book
+    const [reviewData, setReviewData] = useState<Record<number, string[]>>({});
 
     // Fetch books on language, seed, or filters change
     useEffect(() => {
@@ -30,9 +30,7 @@ export default function Home() {
 
         books.forEach((book) => {
             newReviewData[book.index] = Array.from({ length: book.reviews }, () => {
-                // Generate a unique reviewer
                 const reviewer = `${faker.person.firstName()} ${faker.person.lastName()}`;
-                // Generate a unique review sentence
                 const comment = faker.lorem.sentence();
                 return `${reviewer} wrote: "${comment}"`;
             });
@@ -119,6 +117,7 @@ export default function Home() {
                             <th className="border p-2">Title</th>
                             <th className="border p-2">Author(s)</th>
                             <th className="border p-2">Publisher</th>
+                            <th className="border p-2">Likes</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -134,10 +133,17 @@ export default function Home() {
                                     <td className="border p-2">{book.title}</td>
                                     <td className="border p-2">{book.author}</td>
                                     <td className="border p-2">{book.publisher}</td>
+                                    <td className="border p-2 text-center">
+                                        <div className="flex items-center justify-center space-x-2">
+                                            <div className="bg-blue-500 text-white rounded-full p-2 flex items-center">
+                                                <FaThumbsUp className="mr-1" /> {book.likes}
+                                            </div>
+                                        </div>
+                                    </td>
                                 </tr>
                                 {selectedBook?.index === book.index && (
                                     <tr>
-                                        <td colSpan={5} className="p-4 bg-gray-700">
+                                        <td colSpan={6} className="p-4 bg-gray-700">
                                             <div className="p-4 bg-gray-800 shadow rounded text-white">
                                                 <h2 className="text-lg font-bold mb-2">{selectedBook.title}</h2>
                                                 <p className="text-sm mb-2">
@@ -147,7 +153,10 @@ export default function Home() {
                                                     <strong>Publisher:</strong> {selectedBook.publisher}
                                                 </p>
                                                 <p className="text-sm mb-2">
-                                                    <strong>Likes:</strong> {selectedBook.likes}
+                                                    <strong>Likes:</strong>{" "}
+                                                    <div className="inline-flex items-center bg-blue-500 text-white rounded-full px-2 py-1">
+                                                        <FaThumbsUp className="mr-1" /> {selectedBook.likes}
+                                                    </div>
                                                 </p>
                                                 <div className="text-sm">
                                                     <strong>Reviews:</strong>
